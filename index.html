@@ -1,326 +1,92 @@
-<!--
-Blue Lobster Merchandise
-Single-file HTML site suitable for publishing to GitHub Pages.
-
-How to use:
-1. Create a new GitHub repository (public or private).
-2. Add this file as `index.html` at the repository root and commit.
-3. On GitHub, go to Settings -> Pages and set the source to the `main` branch (root). GitHub Pages will publish your site at https://<username>.github.io/<repo>/
-
-This page includes a small JS-powered cart (localStorage), responsive layout, and placeholder products.
-Swap product images, prices and descriptions as needed. For real payments, integrate a payment provider (Stripe, PayPal, etc.).
--->
-
+<!-- Blue Lobster Merchandise - index.html (only One Susan Magruder Call Pass product) -->
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Blue Lobster Merchandise</title>
-  <meta name="description" content="Official Blue Lobster Merchandise — tees, hoodies, stickers, and more." />
-  <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
-
+  <meta name="description" content="Official Blue Lobster Merchandise — exclusive offers and passes." />
   <style>
     :root{
-      --bg:#0f1724; /* near-black navy */
-      --card:#0b1220;
-      --accent:#3aa0ff; /* lobster-blue */
-      --muted:#94a3b8;
-      --glass: rgba(255,255,255,0.03);
-      --radius:14px;
-      --radius-sm:10px;
-      color-scheme: dark;
+      --bg:#0f1724;--card:#0b1220;--accent:#3aa0ff;--muted:#94a3b8;--radius:14px;--radius-sm:10px;color-scheme:dark;
     }
     *{box-sizing:border-box}
-    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial; background:linear-gradient(180deg,#041026 0%, var(--bg) 60%); color:#e6eef8}
-    a{color:var(--accent);text-decoration:none}
-
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;background:linear-gradient(180deg,#041026 0%, var(--bg) 60%);color:#e6eef8}
     .container{max-width:1100px;margin:32px auto;padding:24px}
-
-    header{display:flex;align-items:center;justify-content:space-between;gap:16px}
-    .brand{display:flex;gap:12px;align-items:center}
-    .logo{width:52px;height:52px;background:linear-gradient(135deg,var(--accent),#6dd3ff);display:flex;align-items:center;justify-content:center;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,0.6)}
-    .logo svg{width:34px;height:34px}
+    header{display:flex;align-items:center;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo img{width:52px;height:52px;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,0.6)}
     h1{margin:0;font-size:18px}
     p.tag{margin:0;color:var(--muted);font-size:13px}
-
-    .nav{display:flex;gap:12px;align-items:center}
     .btn{background:var(--accent);color:#042233;padding:10px 14px;border-radius:10px;font-weight:600;border:0;cursor:pointer}
-    .ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:10px}
-
     main{display:grid;grid-template-columns:1fr 320px;gap:24px;margin-top:22px}
-
-    /* HERO + FILTERS */
-    .hero{background:linear-gradient(90deg,rgba(58,160,255,0.06),transparent);padding:20px;border-radius:var(--radius);display:flex;align-items:center;gap:18px}
-    .hero .left{flex:1}
-    .hero h2{margin:0 0 6px 0;font-size:20px}
-    .hero p{margin:0;color:var(--muted)}
-
-    /* products */
     .products{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:16px}
-    .card{background:var(--card);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.02)}
+    .card{background:var(--card);padding:12px;border-radius:12px}
     .thumb{height:180px;border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.15))}
     .thumb img{max-width:100%;max-height:100%;object-fit:cover}
-    .meta{padding-top:10px}
-    .price{font-weight:700}
-    .desc{color:var(--muted);font-size:13px;margin-top:6px}
-
-    .card-footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
-
-    /* cart */
-    .cart{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.12));padding:16px;border-radius:var(--radius);height:fit-content;position:sticky;top:24px}
-    .cart h3{margin:0 0 8px 0}
-    .cart-list{display:flex;flex-direction:column;gap:10px;max-height:360px;overflow:auto;padding-right:6px}
-    .cart-item{display:flex;gap:10px;align-items:center}
-    .cart-item img{width:56px;height:56px;border-radius:8px;object-fit:cover}
-    .qty{display:flex;gap:8px;align-items:center}
-    .small{font-size:13px;color:var(--muted)}
-
+    .cart{background:rgba(255,255,255,0.03);padding:16px;border-radius:var(--radius);position:sticky;top:24px}
     footer{margin-top:28px;color:var(--muted);font-size:13px;text-align:center}
-
-    /* responsive */
-    @media (max-width:880px){main{grid-template-columns:1fr} .cart{position:relative;top:auto}}
-
-    /* little utility */
-    .pill{background:var(--glass);padding:6px 10px;border-radius:999px;font-size:13px;color:var(--muted)}
-
-    /* tiny form styles */
-    input[type='number'], input[type='text'], input[type='email']{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px;border-radius:8px;color:inherit}
-
-    .empty{color:var(--muted);text-align:center;padding:18px;border-radius:10px}
   </style>
 </head>
 <body>
   <div class="container">
     <header>
       <div class="brand">
-        <div class="logo" aria-hidden>
-          <!-- simple lobster icon -->
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2c1.5 0 2.5 1 3 2.5.5 1.5.5 3 0 4.5L12 22 9 14l-3-2.5L12 2z" fill="#042233"/></svg>
-        </div>
+        <!-- Use GitHub-friendly path for the logo -->
+        <div class="logo"><img src="./images/blue-lobster-logo.png" alt="Blue Lobster Logo"></div>
         <div>
           <h1>Blue Lobster Merchandise</h1>
-          <p class="tag">Official store — tees, hoodies, stickers & more</p>
+          <p class="tag">Official store — exclusive passes</p>
         </div>
       </div>
-
-      <nav class="nav">
-        <button class="ghost" id="btnCatalog">Catalog</button>
-        <button class="btn" id="btnCheckoutTop">Checkout</button>
-      </nav>
+      <button class="btn" id="btnCheckoutTop">Checkout</button>
     </header>
 
     <main>
       <section>
-        <div class="hero">
-          <div class="left">
-            <h2>Fresh drops — new Blue Lobster gear</h2>
-            <p>Limited quantities. Fast shipping. Worldwide.</p>
-          </div>
-          <div class="pill">Free shipping over $75</div>
-        </div>
-
-        <div class="products" id="productGrid">
-          <!-- JS fills products here -->
-        </div>
+        <div class="products" id="productGrid"></div>
       </section>
-
-      <aside class="cart" id="cartPane" aria-label="Shopping cart">
-        <h3>Your Cart <span id="cartCount" class="pill">0</span></h3>
-        <div class="cart-list" id="cartList">
-          <div class="empty" id="emptyNotice">Your cart is empty — start shopping!</div>
-        </div>
-        <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
-          <div style="display:flex;justify-content:space-between"><span class="small">Subtotal</span><strong id="subtotal">$0.00</strong></div>
-          <button class="btn" id="btnCheckout">Proceed to Checkout</button>
-          <button class="ghost" id="btnClear">Clear Cart</button>
+      <aside class="cart" id="cartPane">
+        <h3>Your Cart <span id="cartCount">0</span></h3>
+        <div id="cartList"></div>
+        <div style="margin-top:12px">
+          <div><strong>Subtotal:</strong> <span id="subtotal">$0.00</span></div>
+          <button class="btn" id="btnCheckout">Checkout</button>
         </div>
       </aside>
     </main>
 
-    <footer>
-      <div>© <span id="year"></span> Blue Lobster Merchandise — made with ❤️</div>
-      <div style="margin-top:6px;color:var(--muted)">This is a demo storefront. No real payments are processed here.</div>
-    </footer>
+    <footer>© <span id="year"></span> Blue Lobster Merchandise — made with ❤️</footer>
   </div>
 
-  <!-- Checkout modal (very small) -->
-  <dialog id="checkoutModal" style="border-radius:12px;background:linear-gradient(180deg,rgba(4,18,34,0.98),#071226);border:none;padding:18px;color:inherit;">
-    <h3>Checkout</h3>
-    <form id="checkoutForm">
-      <label class="small">Email</label><br>
-      <input type="email" id="email" required placeholder="you@example.com" style="width:100%;margin-bottom:10px" />
-      <label class="small">Shipping Address</label><br>
-      <input type="text" id="address" required placeholder="123 Ocean Ave" style="width:100%;margin-bottom:10px" />
-      <div style="display:flex;gap:8px">
-        <input type="text" id="city" required placeholder="City" style="flex:1" />
-        <input type="text" id="zip" required placeholder="ZIP" style="width:110px" />
-      </div>
-      <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
-        <button type="button" class="ghost" id="btnCancel">Cancel</button>
-        <button type="submit" class="btn">Place Order</button>
-      </div>
-    </form>
-  </dialog>
-
   <script>
-    // sample products
     const PRODUCTS = [
-      {id:'BL-TS-01',title:'Blue Lobster Tee',price:24.00,desc:'Soft ring-spun cotton tee with premium print.',img:'https://images.unsplash.com/photo-1542736667-069246bdbc15?auto=format&fit=crop&w=800&q=60'},
-      {id:'BL-HO-01',title:'Navy Lobster Hoodie',price:54.00,desc:'Cozy midweight hoodie with embroidered logo.',img:'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=800&q=60'},
-      {id:'BL-ST-01',title:'Lobster Sticker Pack',price:6.50,desc:'Pack of 6 waterproof stickers — great for laptops.',img:'https://images.unsplash.com/photo-1520975681919-1e1c8ce2f2da?auto=format&fit=crop&w=800&q=60'},
-      {id:'BL-HAT-01',title:'Sea Cap',price:20.00,desc:'Adjustable cap with embroidered lobster.',img:'https://images.unsplash.com/photo-1543163521-1bf539c55a50?auto=format&fit=crop&w=800&q=60'},
-      {id:'BL-MUG-01',title:'Ocean Mug',price:14.00,desc:'Ceramic mug with Blue Lobster crest.',img:'https://images.unsplash.com/photo-1517685352821-92cf88aee5a5?auto=format&fit=crop&w=800&q=60'}
+      {id:'BL-PASS-01',title:'One Susan Magruder Call Pass',price:5.00,desc:'Special access pass for one call with Susan Magruder.',img:'./images/blue-lobster-logo.png'}
     ];
 
-    // cart state
     let cart = JSON.parse(localStorage.getItem('bl_cart')||'{}');
 
-    const productGrid = document.getElementById('productGrid');
-    const cartList = document.getElementById('cartList');
-    const cartCount = document.getElementById('cartCount');
-    const subtotalEl = document.getElementById('subtotal');
-    const emptyNotice = document.getElementById('emptyNotice');
-    const yearSpan = document.getElementById('year');
-
-    yearSpan.textContent = new Date().getFullYear();
-
     function renderProducts(){
-      productGrid.innerHTML = '';
+      const grid=document.getElementById('productGrid');grid.innerHTML='';
       for(const p of PRODUCTS){
-        const card = document.createElement('div'); card.className='card';
-        card.innerHTML = `
-          <div class="thumb"><img src="${p.img}" alt="${p.title}"></div>
-          <div class="meta">
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <div>
-                <div style="font-weight:700">${p.title}</div>
-                <div class="desc">${p.desc}</div>
-              </div>
-              <div style="text-align:right">
-                <div class="price">$${p.price.toFixed(2)}</div>
-                <div class="small">SKU: ${p.id}</div>
-              </div>
-            </div>
-            <div class="card-footer">
-              <div class="small">Ships in 1–3 business days</div>
-              <div>
-                <button class="btn" data-add="${p.id}">Add</button>
-              </div>
-            </div>
-          </div>
-        `;
-        productGrid.appendChild(card);
+        const card=document.createElement('div');card.className='card';
+        card.innerHTML=`<div class='thumb'><img src='${p.img}' alt='${p.title}'></div><h3>${p.title}</h3><p>${p.desc}</p><strong>$${p.price.toFixed(2)}</strong><br><button class='btn' data-add='${p.id}'>Add to Cart</button>`;
+        grid.appendChild(card);
       }
     }
 
-    function saveCart(){
-      localStorage.setItem('bl_cart', JSON.stringify(cart));
-    }
-
-    function addToCart(id, qty=1){
-      if(!cart[id]) cart[id] = 0; cart[id]+=qty; saveCart(); renderCart();
-    }
-
-    function removeFromCart(id){
-      delete cart[id]; saveCart(); renderCart();
-    }
-
-    function changeQty(id, qty){
-      if(qty<=0){ removeFromCart(id); return; }
-      cart[id]=qty; saveCart(); renderCart();
-    }
-
-    function cartTotals(){
-      let count=0, total=0;
-      for(const id in cart){
-        count += cart[id];
-        const p = PRODUCTS.find(x=>x.id===id);
-        if(p) total += p.price*cart[id];
-      }
-      return {count,total};
-    }
+    function saveCart(){localStorage.setItem('bl_cart',JSON.stringify(cart));}
 
     function renderCart(){
-      cartList.innerHTML = '';
-      const keys = Object.keys(cart);
-      if(keys.length===0){ emptyNotice.style.display='block'; cartCount.textContent='0'; subtotalEl.textContent='$0.00'; return; }
-      emptyNotice.style.display='none';
-      for(const id of keys){
-        const p = PRODUCTS.find(x=>x.id===id);
-        if(!p) continue;
-        const qty = cart[id];
-        const item = document.createElement('div'); item.className='cart-item';
-        item.innerHTML = `
-          <img src="${p.img}" alt="${p.title}">
-          <div style="flex:1">
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <div><strong>${p.title}</strong><div class="small">${p.id}</div></div>
-              <div style="text-align:right">$${(p.price*qty).toFixed(2)}<div class="small">${qty} × $${p.price.toFixed(2)}</div></div>
-            </div>
-            <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
-              <div class="qty">
-                <button class="ghost" data-dec="${id}">−</button>
-                <input type="number" min="1" value="${qty}" style="width:64px" data-q="${id}">
-                <button class="ghost" data-inc="${id}">+</button>
-              </div>
-              <button class="ghost" data-rm="${id}">Remove</button>
-            </div>
-          </div>
-        `;
-        cartList.appendChild(item);
-      }
-      const totals = cartTotals();
-      cartCount.textContent = totals.count;
-      subtotalEl.textContent = `$${totals.total.toFixed(2)}`;
-
-      // attach events for controls
-      cartList.querySelectorAll('[data-inc]').forEach(b=>b.addEventListener('click', ()=>{ addToCart(b.getAttribute('data-inc'),1); }));
-      cartList.querySelectorAll('[data-dec]').forEach(b=>b.addEventListener('click', ()=>{
-        const id=b.getAttribute('data-dec'); changeQty(id, (cart[id] || 1)-1);
-      }));
-      cartList.querySelectorAll('[data-rm]').forEach(b=>b.addEventListener('click', ()=>{ removeFromCart(b.getAttribute('data-rm')); }));
-      cartList.querySelectorAll('input[data-q]').forEach(inp=>{
-        inp.addEventListener('change', ()=>{
-          const id = inp.getAttribute('data-q'); const v = parseInt(inp.value)||1; changeQty(id, v);
-        });
-      });
+      const list=document.getElementById('cartList');list.innerHTML='';let total=0,count=0;
+      for(const id in cart){const p=PRODUCTS.find(x=>x.id===id);if(!p)continue;const qty=cart[id];total+=p.price*qty;count+=qty;const item=document.createElement('div');item.innerHTML=`${p.title} × ${qty} - $${(p.price*qty).toFixed(2)}`;list.appendChild(item);}
+      document.getElementById('cartCount').textContent=count;document.getElementById('subtotal').textContent=`$${total.toFixed(2)}`;
     }
 
-    // wire up product Add buttons
-    document.addEventListener('click', (e)=>{
-      const add = e.target.closest('[data-add]');
-      if(add){ const id = add.getAttribute('data-add'); addToCart(id,1); }
-    });
+    document.addEventListener('click',e=>{const b=e.target.closest('[data-add]');if(!b)return;const id=b.getAttribute('data-add');cart[id]=(cart[id]||0)+1;saveCart();renderCart();});
 
-    document.getElementById('btnClear').addEventListener('click', ()=>{
-      if(confirm('Clear the cart?')){ cart = {}; saveCart(); renderCart(); }
-    });
-
-    // checkout modal
-    const checkoutModal = document.getElementById('checkoutModal');
-    document.getElementById('btnCheckout').addEventListener('click', ()=>{
-      if(Object.keys(cart).length===0){ alert('Your cart is empty.'); return; }
-      checkoutModal.showModal();
-    });
-    document.getElementById('btnCheckoutTop').addEventListener('click', ()=> document.getElementById('btnCheckout').click());
-    document.getElementById('btnCancel').addEventListener('click', ()=> checkoutModal.close());
-
-    document.getElementById('checkoutForm').addEventListener('submit', (ev)=>{
-      ev.preventDefault();
-      // NOTE: This is a demo. Here you would call your payment/fulfillment API.
-      const totals = cartTotals();
-      alert(`Thank you! Your order for ${totals.count} item(s) totaling $${totals.total.toFixed(2)} has been placed (demo).`);
-      cart = {}; saveCart(); renderCart(); checkoutModal.close();
-    });
-
-    // initial render
-    renderProducts(); renderCart();
-
-    // small niceties
-    document.getElementById('btnCatalog').addEventListener('click', ()=> window.scrollTo({top:document.querySelector('.products').offsetTop - 20, behavior:'smooth'}));
-
-    // allow pressing Enter on search? (future enhancement)
+    document.getElementById('year').textContent=new Date().getFullYear();
+    renderProducts();renderCart();
   </script>
 </body>
 </html>
