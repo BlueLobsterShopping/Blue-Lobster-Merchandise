@@ -86,6 +86,12 @@
 
     .price {
       font-weight: bold;
+      margin-bottom: 0.3rem;
+    }
+
+    .stock {
+      color: #16a34a;
+      font-size: 0.95rem;
       margin-bottom: 1rem;
     }
 
@@ -165,6 +171,7 @@
       <h2>Susan Magruder Call Pass</h2>
       <p>Get your exclusive access call pass with Susan Magruder.</p>
       <p class="price">$5.00</p>
+      <p class="stock">In Stock: ∞</p>
       <button onclick="addToCart('Susan Magruder Call Pass', 5)">Add to Cart</button>
     </div>
 
@@ -173,6 +180,7 @@
       <h2>Blue Lobster Software Hoodie</h2>
       <p>Cozy up with the official Blue Lobster Software Hoodie.</p>
       <p class="price">$45.00 + Shipping</p>
+      <p class="stock" id="hoodieStock">In Stock: 5</p>
       <button onclick="addToCart('Blue Lobster Software Hoodie', 45)">Add to Cart</button>
     </div>
   </main>
@@ -196,20 +204,37 @@
     const cartItemsContainer = document.getElementById('cartItems');
     const cartCount = document.getElementById('cartCount');
     const cartTotal = document.getElementById('cartTotal');
+    let hoodieStock = 5;
 
     function addToCart(name, price) {
+      if (name === 'Blue Lobster Software Hoodie' && hoodieStock <= 0) {
+        alert('Sorry, the Blue Lobster Software Hoodie is out of stock.');
+        return;
+      }
+
       const existing = cart.find(item => item.name === name);
       if (existing) {
         existing.qty++;
       } else {
         cart.push({ name, price, qty: 1 });
       }
+
+      if (name === 'Blue Lobster Software Hoodie') {
+        hoodieStock--;
+        document.getElementById('hoodieStock').textContent = `In Stock: ${hoodieStock}`;
+      }
+
       updateCartDisplay();
     }
 
     function removeFromCart(name) {
       const index = cart.findIndex(item => item.name === name);
       if (index > -1) {
+        const removed = cart[index];
+        if (removed.name === 'Blue Lobster Software Hoodie') {
+          hoodieStock += removed.qty;
+          document.getElementById('hoodieStock').textContent = `In Stock: ${hoodieStock}`;
+        }
         cart.splice(index, 1);
       }
       updateCartDisplay();
